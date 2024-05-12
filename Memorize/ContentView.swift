@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State var selectedTheme = themes.def
-    @State var cardCount = 10
+    @State var cardCount = 4
     
     enum themes {
         case def
@@ -18,9 +18,9 @@ struct ContentView: View {
     }
     
     let contents: [themes: [String]] = [
-        .def:  ["👻", "👻", "🐔", "🐔", "👰🏻‍♂️", "👰🏻‍♂️", "🐵", "🐵", "🐉", "🐉", "🪃", "🪃","🧞‍♂️", "🧞‍♂️", "🐧", "🐧", "👹", "👹", "🐥", "🐥", "🐘", "🐘", "🧙‍♀️","🧙‍♀️", "🧙🏼‍♂️", "🧙🏼‍♂️"],
-        .hallowen: ["🎃", "🎃", "🕷️", "🕷️", "👻", "👻", "👽","👽", "👹", "👹", "🧙‍♀️", "🧙‍♀️", "🧟‍♂️", "🧟‍♂️", "🧛🏼‍♂️", "🧛🏼‍♂️", "🧌", "🧌", "🧟‍♀️", "🧟‍♀️", "🧙🏼‍♂️", "🧙🏼‍♂️", "🕸️", "🕸️", "🦸🏻‍♀️", "🦸🏻‍♀️", "🧝🏾‍♀️", "🧝🏾‍♀️"],
-        .christmas: ["☃️", "☃️", "⛄️", "⛄️", "🎅🏼", "🎅🏼", "🧑🏽‍🎄", "🧑🏽‍🎄", "❄️", "❄️", "🌨️", "🌨️", "🎁", "🎁", "🌟", "🌟", "🦌", "🦌", "🍪", "🍪", "🔔", "🍪", "🎄", "🎄", "🍾", "🍾", "🌠", "🌠", "🎉", "🎉"]
+        .def:  ["👻", "🐔", "👰🏻‍♂️", "🐵", "🐉", "🪃","🧞‍♂️", "🐧", "👹", "🐥", "🐘","🧙‍♀️", "🧙🏼‍♂️"],
+        .hallowen: ["🎃", "🕷️", "👻", "👽", "👹", "🧙‍♀️", "🧟‍♂️", "🧛🏼‍♂️", "🧌", "🧟‍♀️", "🧙🏼‍♂️", "🕸️", "🦸🏻‍♀️", "🧝🏾‍♀️"],
+        .christmas: ["☃️", "⛄️", "🎅🏼", "🧑🏽‍🎄", "❄️", "🌨️", "🎁", "🌟", "🦌", "🍪", "🔔", "🎄", "🍾", "🌠", "🎉"]
     ]
     
    
@@ -62,19 +62,24 @@ struct ContentView: View {
         }
     }
 
-    
     var cards: some View {
         LazyVGrid (columns: [GridItem(.adaptive(minimum: 79))]) {
-            ForEach(0..<cardCount, id: \.self) { index in
-                if let content = contents[selectedTheme] {
-                    CardView(content: content[index])
-                        .aspectRatio(2/3, contentMode: .fit)
-                }
+            let content = getShuffleCards()
+            ForEach(0..<content.count, id: \.self) { index in
+                CardView(content: content[index])
+                    .aspectRatio(2/3, contentMode: .fit)
             }
         }
         .foregroundColor(getColorBasedOnTheme(theme: selectedTheme))
     }
     
+    func getShuffleCards() -> [String] {
+        var shuffledCards: [String] = []
+        if let content = contents[selectedTheme] {
+            shuffledCards += content.prefix(upTo: cardCount + 1) + content.prefix(upTo: cardCount + 1)
+        }
+        return shuffledCards.shuffled()
+    }
     
     func cardCountAdjuster(by offset: Int, symbol: String) -> some View {
         Button(action: {
@@ -86,7 +91,7 @@ struct ContentView: View {
         })
         .disabled({
             if let theme = contents[selectedTheme] {
-                return cardCount + offset < 1 || cardCount + offset > theme.count
+                return cardCount + offset < 4 || cardCount + offset > theme.count
             } else {
                 return false
             }
@@ -151,7 +156,7 @@ struct ContentView: View {
 }
 
 struct CardView: View {
-    @State var isFaceUp = false
+    @State var isFaceUp = true
     let content : String
     
     var body: some View {
