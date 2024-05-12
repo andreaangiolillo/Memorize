@@ -8,16 +8,30 @@
 import SwiftUI
 
 struct ContentView: View {
-    let contents = ["👻", "🕷️", "🐵", "🎃", "👽", "👹", "🐉", "⛄️", "🐔", "☃️", "🧙‍♀️", "🥷", "👰🏻‍♂️", "🧝🏾‍♀️", "🧙🏼‍♂️" ]
+    @State var selectedTheme = themes.def
     @State var cardCount = 4
     
+    enum themes {
+        case def
+        case hallowen
+        case christmas
+    }
+    
+    let contents: [themes: [String]] = [
+        .def:  ["👻", "👨🏻‍🚀", "🐵", "🧞‍♂️", "🐧", "👹", "🐉", "🐥", "🐔", "🐘", "🧙‍♀️", "🪃", "👰🏻‍♂️", "🧝🏾‍♀️", "🧙🏼‍♂️" ],
+        .hallowen: ["🎃", "🕷️", "👻", "👽", "👹", "🧙‍♀️", "🧟‍♂️", "🧛🏼‍♂️", "🧌", "🧟‍♀️", "🧙🏼‍♂️", "🕸️", "🦸🏻‍♀️", "🥷", "🧝🏾‍♀️"],
+        .christmas: ["☃️", "⛄️", "🎅🏼", "🧑🏽‍🎄", "❄️", "🌨️", "🎁", "🌟", "🦌", "🍪", "🔔", "🎄", "🍾", "🌠", "🎉"]
+    ]
+    
+   
     var body: some View {
         VStack{
+            cardCountAdjuster
             ScrollView{
                 cards
             }
             Spacer()
-            cardCountAdjuster
+            themesAdjuster
         }
         .padding()
     }
@@ -26,17 +40,38 @@ struct ContentView: View {
         HStack{
             cardRemover
             Spacer()
+            Text("Memorize")
+                .font(.largeTitle)
+                .bold()
+            Spacer()
             cardAdder
         }
         .imageScale(.large)
         .font(.largeTitle)
     }
     
+    var themesAdjuster: some View {
+        HStack {
+            Spacer()
+            defaultTheme
+            Spacer()
+            hallowenTheme
+            Spacer()
+            christmasTheme
+            Spacer()
+        }
+        .imageScale(.large)
+        .font(.title2)
+    }
+
+    
     var cards: some View {
         LazyVGrid (columns: [GridItem(.adaptive(minimum: 120))]) {
             ForEach(0..<cardCount, id: \.self) { index in
-                CardView(content: contents[index])
-                    .aspectRatio(2/3, contentMode: .fit)
+                if let content = contents[selectedTheme] {
+                    CardView(content: content[index])
+                        .aspectRatio(2/3, contentMode: .fit)
+                }
             }
         }
         .foregroundColor(.orange)
@@ -46,11 +81,40 @@ struct ContentView: View {
     func cardCountAdjuster(by offset: Int, symbol: String) -> some View {
         Button(action: {
             cardCount += offset
+            
         }, label: {
             Image(systemName: symbol)
         })
-        .disabled(cardCount + offset < 1 || cardCount + offset > contents.count)
+        .disabled({
+            if let theme = contents[selectedTheme] {
+                return cardCount + offset < 1 || cardCount + offset > theme.count
+            } else {
+                return false
+            }
+        }())
     }
+    
+    
+    func themeAdjuster(theme: themes, symbol: String) -> some View {
+        Button(action: {
+            selectedTheme = theme
+        }, label: {
+            VStack{
+                Image(systemName: symbol)
+                Text({
+                    switch theme {
+                    case .def:
+                        return "Default"
+                    case.christmas:
+                        return "Christmas"
+                    case.hallowen:
+                        return "Hallowen"
+                    }
+                }())
+            }
+        })
+    }
+    
     
     var cardRemover: some View {
         return cardCountAdjuster(by: -1, symbol: "rectangle.stack.fill.badge.minus")
@@ -59,10 +123,22 @@ struct ContentView: View {
     var cardAdder: some View {
         return cardCountAdjuster(by: +1, symbol: "rectangle.stack.fill.badge.plus")
     }
+    
+    var defaultTheme: some View {
+        return themeAdjuster(theme: themes.def, symbol: "restart.circle")
+    }
+    
+    var hallowenTheme: some View {
+        return themeAdjuster(theme: themes.hallowen, symbol: "theatermasks.circle")
+    }
+    
+    var christmasTheme: some View {
+        return themeAdjuster(theme: themes.christmas, symbol: "gift.circle")
+    }
 }
 
 struct CardView: View {
-    @State var isFaceUp = false
+    @State var isFaceUp = true
     let content : String
     
     var body: some View {
