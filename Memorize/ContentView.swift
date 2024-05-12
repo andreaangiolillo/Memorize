@@ -60,8 +60,6 @@ struct ContentView: View {
             christmasTheme
             Spacer()
         }
-        .imageScale(.large)
-        .font(.title2)
     }
 
     
@@ -101,6 +99,8 @@ struct ContentView: View {
         }, label: {
             VStack{
                 Image(systemName: symbol)
+                    .imageScale(.large)
+                    .font(.largeTitle)
                 Text({
                     switch theme {
                     case .def:
@@ -110,7 +110,7 @@ struct ContentView: View {
                     case.hallowen:
                         return "Hallowen"
                     }
-                }())
+                }()).font(.body)
             }
         })
     }
