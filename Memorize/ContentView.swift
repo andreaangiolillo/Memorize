@@ -156,7 +156,7 @@ struct ContentView: View {
 }
 
 struct CardView: View {
-    @State var isFaceUp = true
+    @State var isFaceUp = false
     let content : String
     
     var body: some View {
