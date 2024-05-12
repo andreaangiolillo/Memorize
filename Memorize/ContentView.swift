@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State var selectedTheme = themes.def
-    @State var cardCount = 4
+    @State var cardCount = 10
     
     enum themes {
         case def
@@ -18,9 +18,9 @@ struct ContentView: View {
     }
     
     let contents: [themes: [String]] = [
-        .def:  ["👻", "👨🏻‍🚀", "🐵", "🧞‍♂️", "🐧", "👹", "🐉", "🐥", "🐔", "🐘", "🧙‍♀️", "🪃", "👰🏻‍♂️", "🧝🏾‍♀️", "🧙🏼‍♂️" ],
-        .hallowen: ["🎃", "🕷️", "👻", "👽", "👹", "🧙‍♀️", "🧟‍♂️", "🧛🏼‍♂️", "🧌", "🧟‍♀️", "🧙🏼‍♂️", "🕸️", "🦸🏻‍♀️", "🥷", "🧝🏾‍♀️"],
-        .christmas: ["☃️", "⛄️", "🎅🏼", "🧑🏽‍🎄", "❄️", "🌨️", "🎁", "🌟", "🦌", "🍪", "🔔", "🎄", "🍾", "🌠", "🎉"]
+        .def:  ["👻", "👻", "🐔", "🐔", "👰🏻‍♂️", "👰🏻‍♂️", "🐵", "🐵", "🐉", "🐉", "🪃", "🪃","🧞‍♂️", "🧞‍♂️", "🐧", "🐧", "👹", "👹", "🐥", "🐥", "🐘", "🐘", "🧙‍♀️","🧙‍♀️", "🧙🏼‍♂️", "🧙🏼‍♂️"],
+        .hallowen: ["🎃", "🎃", "🕷️", "🕷️", "👻", "👻", "👽","👽", "👹", "👹", "🧙‍♀️", "🧙‍♀️", "🧟‍♂️", "🧟‍♂️", "🧛🏼‍♂️", "🧛🏼‍♂️", "🧌", "🧌", "🧟‍♀️", "🧟‍♀️", "🧙🏼‍♂️", "🧙🏼‍♂️", "🕸️", "🕸️", "🦸🏻‍♀️", "🦸🏻‍♀️", "🧝🏾‍♀️", "🧝🏾‍♀️"],
+        .christmas: ["☃️", "☃️", "⛄️", "⛄️", "🎅🏼", "🎅🏼", "🧑🏽‍🎄", "🧑🏽‍🎄", "❄️", "❄️", "🌨️", "🌨️", "🎁", "🎁", "🌟", "🌟", "🦌", "🦌", "🍪", "🍪", "🔔", "🍪", "🎄", "🎄", "🍾", "🍾", "🌠", "🌠", "🎉", "🎉"]
     ]
     
    
@@ -64,7 +64,7 @@ struct ContentView: View {
 
     
     var cards: some View {
-        LazyVGrid (columns: [GridItem(.adaptive(minimum: 120))]) {
+        LazyVGrid (columns: [GridItem(.adaptive(minimum: 79))]) {
             ForEach(0..<cardCount, id: \.self) { index in
                 if let content = contents[selectedTheme] {
                     CardView(content: content[index])
@@ -72,7 +72,7 @@ struct ContentView: View {
                 }
             }
         }
-        .foregroundColor(.orange)
+        .foregroundColor(getColorBasedOnTheme(theme: selectedTheme))
     }
     
     
@@ -82,6 +82,7 @@ struct ContentView: View {
             
         }, label: {
             Image(systemName: symbol)
+                .foregroundColor(getColorBasedOnTheme(theme: selectedTheme))
         })
         .disabled({
             if let theme = contents[selectedTheme] {
@@ -112,7 +113,19 @@ struct ContentView: View {
                     }
                 }()).font(.body)
             }
+            .foregroundColor(getColorBasedOnTheme(theme: theme))
         })
+    }
+    
+    func getColorBasedOnTheme(theme: themes) -> Color {
+        switch theme {
+        case .def:
+            return .blue
+        case.christmas:
+            return .red
+        case.hallowen:
+            return .orange
+        }
     }
     
     
@@ -138,7 +151,7 @@ struct ContentView: View {
 }
 
 struct CardView: View {
-    @State var isFaceUp = true
+    @State var isFaceUp = false
     let content : String
     
     var body: some View {
