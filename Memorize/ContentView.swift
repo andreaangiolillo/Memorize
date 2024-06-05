@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State var selectedTheme = themes.def
-    @State var cardCount = 4
+    @State var cardCount = 2
     
     enum themes {
         case def
@@ -24,6 +24,7 @@ struct ContentView: View {
     ]
     
    
+    // body contains the root view shown in the app
     var body: some View {
         VStack{
             cardCountAdjuster
@@ -36,6 +37,7 @@ struct ContentView: View {
         .padding()
     }
     
+    // cardCountAdjuster represents the view containing the remove/add buttons and title
     var cardCountAdjuster: some View {
         HStack{
             cardRemover
@@ -50,6 +52,7 @@ struct ContentView: View {
         .font(.largeTitle)
     }
     
+    // themesAdjuster contains the themes buttons views.
     var themesAdjuster: some View {
         HStack {
             Spacer()
@@ -62,6 +65,7 @@ struct ContentView: View {
         }
     }
 
+    
     var cards: some View {
         LazyVGrid (columns: [GridItem(.adaptive(minimum: 79))]) {
             let content = getShuffleCards()
@@ -73,14 +77,23 @@ struct ContentView: View {
         .foregroundColor(getColorBasedOnTheme(theme: selectedTheme))
     }
     
+    /*
+     getShuffleCards returns an array of card's content where
+     each element appear two times and order is shuffled.
+     */
     func getShuffleCards() -> [String] {
         var shuffledCards: [String] = []
         if let content = contents[selectedTheme] {
-            shuffledCards += content.prefix(upTo: cardCount + 1) + content.prefix(upTo: cardCount + 1)
+            shuffledCards += content.prefix(upTo: cardCount) + content.prefix(upTo: cardCount)
         }
         return shuffledCards.shuffled()
     }
     
+    /*
+     cardCountAdjuster returns a Button with the symbol passed as input
+     that applies the offset to the cardCount. This function is the core logic
+     of the add/remove card buttons.
+     */
     func cardCountAdjuster(by offset: Int, symbol: String) -> some View {
         Button(action: {
             cardCount += offset
@@ -91,7 +104,7 @@ struct ContentView: View {
         })
         .disabled({
             if let theme = contents[selectedTheme] {
-                return cardCount + offset < 4 || cardCount + offset > theme.count
+                return cardCount + offset < 2 || cardCount + offset > theme.count
             } else {
                 return false
             }
