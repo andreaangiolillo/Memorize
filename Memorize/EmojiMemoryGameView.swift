@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  EmojiMemoryGameView.swift
 //  Memorize
 //
 //  Created by Andrea on 08/05/2024.
@@ -7,11 +7,12 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct EmojiMemoryGameView: View {
     @State var selectedTheme = themes.def
     @State var cardCount = 2
     
-    var emojiMemoryController: EmojiMemoryGame
+    @ObservedObject var emojiMemoryController:EmojiMemoryGame
+    
     enum themes {
         case def
         case hallowen
@@ -68,11 +69,12 @@ struct ContentView: View {
 
     
     var cards: some View {
-        LazyVGrid (columns: [GridItem(.adaptive(minimum: 79))]) {
+        LazyVGrid (columns: [GridItem(.adaptive(minimum: 79), spacing: 0)] , spacing: 0) {
             let content = getShuffleCards()
             ForEach(0..<content.count, id: \.self) { index in
                 CardView(content: content[index])
                     .aspectRatio(2/3, contentMode: .fit)
+                    .padding(4)
             }
         }
         .foregroundColor(getColorBasedOnTheme(theme: selectedTheme))
@@ -179,7 +181,10 @@ struct CardView: View {
             Group {
                 base.strokeBorder(lineWidth: 2).foregroundColor(.white)
                 base.strokeBorder(lineWidth: 2)
-                Text(content).font(.largeTitle)
+                Text(content)
+                    .font(.system(size: 200))
+                    .minimumScaleFactor(0.01)
+                    .aspectRatio(1, contentMode: .fit)
             }
             .opacity(isFaceUp ? 1 : 0)
             base.fill().opacity(isFaceUp ? 0 : 1)
@@ -191,5 +196,5 @@ struct CardView: View {
 }
 
 #Preview {
-    ContentView()
+    EmojiMemoryGameView(emojiMemoryController: EmojiMemoryGame())
 }
