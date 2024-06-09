@@ -11,6 +11,7 @@ struct ContentView: View {
     @State var selectedTheme = themes.def
     @State var cardCount = 2
     
+    var emojiMemoryController: EmojiMemoryGame
     enum themes {
         case def
         case hallowen
