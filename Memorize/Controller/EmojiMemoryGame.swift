@@ -8,18 +8,32 @@
 import Foundation
 
 class EmojiMemoryGame: ObservableObject {
-    private static let emojis = ["👻", "🐔", "👰🏻‍♂️", "🐵", "🐉", "🪃","🧞‍♂️", "🐧", "👹", "🐥", "🐘","🧙‍♀️", "🧙🏼‍♂️"]
+    enum Themes {
+        case def
+        case halloween
+        case christmas
+    }
     
-    private static func createMemoryGame() -> MemoryGame<String> {
+    private static let contents: [Themes: [String]] = [
+        .def:  ["👻", "🐔", "👰🏻‍♂️", "🐵", "🐉", "🪃","🧞‍♂️", "🐧", "👹", "🐥", "🐘","🧙‍♀️", "🧙🏼‍♂️"],
+        .halloween: ["🎃", "🕷️", "👻", "👽", "👹", "🧙‍♀️", "🧟‍♂️", "🧛🏼‍♂️", "🧌", "🧟‍♀️", "🧙🏼‍♂️", "🕸️", "🦸🏻‍♀️", "🧝🏾‍♀️"],
+        .christmas: ["☃️", "⛄️", "🎅🏼", "🧑🏽‍🎄", "❄️", "🌨️", "🎁", "🌟", "🦌", "🍪", "🔔", "🎄", "🍾", "🌠", "🎉"]
+    ]
+    
+    private static func createMemoryGame(_ theme: Themes = .def) -> MemoryGame<String> {
+        let emoji = contents[theme]!.shuffled()
         return MemoryGame(numberOfPairsOfCards: 4){ pairIndex in
-            if emojis.indices.contains(pairIndex){
-                return  emojis[pairIndex]
+            if emoji.indices.contains(pairIndex){
+                return  emoji[pairIndex]
             }
             return "⁉️"
         }
     }
     
+    
     @Published private var model = createMemoryGame()
+    @Published private var selectedTheme = Themes.def
+    @Published private var cardCount = 4
     
     var cards: Array<MemoryGame<String>.Card> {
         return model.cards
@@ -27,5 +41,46 @@ class EmojiMemoryGame: ObservableObject {
     
     func choose(_ card: MemoryGame<String>.Card){
         model.choose(card: card)
+    }
+    
+    var theme: Themes {
+        return selectedTheme
+    }
+    
+    var count: Int {
+        return cardCount
+    }
+    
+    func isValidCountAdjustement(by offset: Int) -> Bool{
+            return cardCount + offset > 2 && cardCount + offset < EmojiMemoryGame.contents[.def]!.count
+    }
+    
+    // MARK: - Intents
+    
+    func changeTheme(_ theme: Themes){
+        selectedTheme = theme
+        newCards(cardCount)
+    }
+    
+    func newCards(_ numberOfPairsOfCards: Int) {
+        let emoji = EmojiMemoryGame.contents[theme]!
+        model.changeCards(numberOfPairsOfCards: numberOfPairsOfCards){ pairIndex in
+            if emoji.indices.contains(pairIndex){
+                return  emoji[pairIndex]
+            }
+            return "⁉️"
+        }
+    }
+    
+    
+    func adjustCardCount(by offset: Int){
+        if (isValidCountAdjustement(by: offset)) {
+            cardCount += offset
+            newCards(cardCount)
+        }
+    }
+    
+    func shuffle() {
+        model.shuffle()
     }
 }
