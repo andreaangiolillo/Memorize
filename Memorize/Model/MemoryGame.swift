@@ -8,12 +8,6 @@
 import Foundation
 
 struct MemoryGame <CardContent> {
-    enum Themes {
-        case def
-        case halloween
-        case christmas
-    }
-
     private(set) var cards: Array<Card>
     
     init(numberOfPairsOfCards: Int, cardContentFactory: (Int) -> CardContent) {
@@ -30,9 +24,26 @@ struct MemoryGame <CardContent> {
         
     }
     
+    mutating func changeCards(numberOfPairsOfCards: Int, cardContentFactory: (Int) -> CardContent) {
+        cards = []
+        for pairIndex in 0..<max(2, numberOfPairsOfCards) {
+            let content = cardContentFactory(pairIndex)
+            cards.append(Card( content: content))
+            cards.append(Card( content: content))
+        }
+    }
+    
+    mutating func shuffle(){
+        cards.shuffle()
+    }
+    
     struct Card {
-        var isFaceUp = false
+        var isFaceUp = true
         var isMatched = false
         let content: CardContent
+        
+        mutating func toggle(){
+            isFaceUp.toggle()
+        }
     }
 }

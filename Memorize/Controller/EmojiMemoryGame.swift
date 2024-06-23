@@ -21,8 +21,8 @@ class EmojiMemoryGame: ObservableObject {
         .christmas: ["☃️", "⛄️", "🎅🏼", "🧑🏽‍🎄", "❄️", "🌨️", "🎁", "🌟", "🦌", "🍪", "🔔", "🎄", "🍾", "🌠", "🎉"]
     ]
     
-    private static func createMemoryGame() -> MemoryGame<String> {
-        let emoji = contents[Themes.def]!
+    private static func createMemoryGame(_ theme: Themes = .def) -> MemoryGame<String> {
+        let emoji = contents[theme]!.shuffled()
         return MemoryGame(numberOfPairsOfCards: 4){ pairIndex in
             if emoji.indices.contains(pairIndex){
                 return  emojis[pairIndex]
@@ -30,6 +30,7 @@ class EmojiMemoryGame: ObservableObject {
             return "⁉️"
         }
     }
+    
     
     @Published private var model = createMemoryGame()
     @Published private var selectedTheme = Themes.def
@@ -46,7 +47,24 @@ class EmojiMemoryGame: ObservableObject {
         return selectedTheme
     }
     
+    // MARK: - Intents
+    
     func changeTheme(_ theme: Themes){
         selectedTheme = theme
+        newCards(4)
+    }
+    
+    func newCards(_ numberOfPairsOfCards: Int) {
+        model.changeCards(numberOfPairsOfCards: numberOfPairsOfCards){ pairIndex in
+            let emoji = EmojiMemoryGame.contents[theme]!.shuffled()
+            if emoji.indices.contains(pairIndex){
+                return  emoji[pairIndex]
+            }
+            return "⁉️"
+        }
+    }
+    
+    func shuffle() {
+        model.shuffle()
     }
 }
