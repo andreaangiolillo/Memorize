@@ -8,11 +8,23 @@
 import Foundation
 
 class EmojiMemoryGame: ObservableObject {
+    enum Themes {
+        case def
+        case halloween
+        case christmas
+    }
+    
     private static let emojis = ["👻", "🐔", "👰🏻‍♂️", "🐵", "🐉", "🪃","🧞‍♂️", "🐧", "👹", "🐥", "🐘","🧙‍♀️", "🧙🏼‍♂️"]
+    private static let contents: [Themes: [String]] = [
+        .def:  ["👻", "🐔", "👰🏻‍♂️", "🐵", "🐉", "🪃","🧞‍♂️", "🐧", "👹", "🐥", "🐘","🧙‍♀️", "🧙🏼‍♂️"],
+        .halloween: ["🎃", "🕷️", "👻", "👽", "👹", "🧙‍♀️", "🧟‍♂️", "🧛🏼‍♂️", "🧌", "🧟‍♀️", "🧙🏼‍♂️", "🕸️", "🦸🏻‍♀️", "🧝🏾‍♀️"],
+        .christmas: ["☃️", "⛄️", "🎅🏼", "🧑🏽‍🎄", "❄️", "🌨️", "🎁", "🌟", "🦌", "🍪", "🔔", "🎄", "🍾", "🌠", "🎉"]
+    ]
     
     private static func createMemoryGame() -> MemoryGame<String> {
+        let emoji = contents[Themes.def]!
         return MemoryGame(numberOfPairsOfCards: 4){ pairIndex in
-            if emojis.indices.contains(pairIndex){
+            if emoji.indices.contains(pairIndex){
                 return  emojis[pairIndex]
             }
             return "⁉️"
@@ -20,6 +32,7 @@ class EmojiMemoryGame: ObservableObject {
     }
     
     @Published private var model = createMemoryGame()
+    @Published private var selectedTheme = Themes.def
     
     var cards: Array<MemoryGame<String>.Card> {
         return model.cards
@@ -27,5 +40,13 @@ class EmojiMemoryGame: ObservableObject {
     
     func choose(_ card: MemoryGame<String>.Card){
         model.choose(card: card)
+    }
+    
+    var theme: Themes {
+        return selectedTheme
+    }
+    
+    func changeTheme(_ theme: Themes){
+        selectedTheme = theme
     }
 }
