@@ -8,8 +8,6 @@
 import SwiftUI
 
 struct EmojiMemoryGameView: View {
-    @State var cardCount = 2
-    
     @ObservedObject var emojiMemoryController:EmojiMemoryGame
    
     // body contains the root view shown in the app
@@ -72,14 +70,18 @@ struct EmojiMemoryGameView: View {
      */
     func cardCountAdjuster(by offset: Int, symbol: String) -> some View {
         Button(action: {
-            cardCount += offset
-            
+            if (emojiMemoryController.isValidCountAdjustement(by: offset)) {
+                emojiMemoryController.adjustCardCount(by: offset)
+            }
         }, label: {
             Image(systemName: symbol)
-                .foregroundColor(getColorBasedOnTheme(theme: emojiMemoryController.theme))
+                .foregroundColor(
+                    emojiMemoryController.isValidCountAdjustement(by: offset) ?
+                    getColorBasedOnTheme(theme: emojiMemoryController.theme) :
+                        Color.gray)
         })
         .disabled({
-                return cardCount + offset < 2 || cardCount + offset > emojiMemoryController.cards.count
+            return !emojiMemoryController.isValidCountAdjustement(by: offset)
         }())
     }
     

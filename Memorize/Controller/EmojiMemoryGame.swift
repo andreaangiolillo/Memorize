@@ -14,7 +14,6 @@ class EmojiMemoryGame: ObservableObject {
         case christmas
     }
     
-    private static let emojis = ["👻", "🐔", "👰🏻‍♂️", "🐵", "🐉", "🪃","🧞‍♂️", "🐧", "👹", "🐥", "🐘","🧙‍♀️", "🧙🏼‍♂️"]
     private static let contents: [Themes: [String]] = [
         .def:  ["👻", "🐔", "👰🏻‍♂️", "🐵", "🐉", "🪃","🧞‍♂️", "🐧", "👹", "🐥", "🐘","🧙‍♀️", "🧙🏼‍♂️"],
         .halloween: ["🎃", "🕷️", "👻", "👽", "👹", "🧙‍♀️", "🧟‍♂️", "🧛🏼‍♂️", "🧌", "🧟‍♀️", "🧙🏼‍♂️", "🕸️", "🦸🏻‍♀️", "🧝🏾‍♀️"],
@@ -25,7 +24,7 @@ class EmojiMemoryGame: ObservableObject {
         let emoji = contents[theme]!.shuffled()
         return MemoryGame(numberOfPairsOfCards: 4){ pairIndex in
             if emoji.indices.contains(pairIndex){
-                return  emojis[pairIndex]
+                return  emoji[pairIndex]
             }
             return "⁉️"
         }
@@ -34,6 +33,7 @@ class EmojiMemoryGame: ObservableObject {
     
     @Published private var model = createMemoryGame()
     @Published private var selectedTheme = Themes.def
+    @Published private var cardCount = 4
     
     var cards: Array<MemoryGame<String>.Card> {
         return model.cards
@@ -47,20 +47,36 @@ class EmojiMemoryGame: ObservableObject {
         return selectedTheme
     }
     
+    var count: Int {
+        return cardCount
+    }
+    
+    func isValidCountAdjustement(by offset: Int) -> Bool{
+            return cardCount + offset > 2 && cardCount + offset < EmojiMemoryGame.contents[.def]!.count
+    }
+    
     // MARK: - Intents
     
     func changeTheme(_ theme: Themes){
         selectedTheme = theme
-        newCards(4)
+        newCards(cardCount)
     }
     
     func newCards(_ numberOfPairsOfCards: Int) {
+        let emoji = EmojiMemoryGame.contents[theme]!
         model.changeCards(numberOfPairsOfCards: numberOfPairsOfCards){ pairIndex in
-            let emoji = EmojiMemoryGame.contents[theme]!.shuffled()
             if emoji.indices.contains(pairIndex){
                 return  emoji[pairIndex]
             }
             return "⁉️"
+        }
+    }
+    
+    
+    func adjustCardCount(by offset: Int){
+        if (isValidCountAdjustement(by: offset)) {
+            cardCount += offset
+            newCards(cardCount)
         }
     }
     
