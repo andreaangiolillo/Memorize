@@ -16,6 +16,7 @@ struct EmojiMemoryGameView: View {
             cardCountAdjuster
             ScrollView{
                 cards
+                    .animation(.default, value: emojiMemoryController.cards)
             }
             Spacer()
             themesAdjuster
@@ -54,8 +55,8 @@ struct EmojiMemoryGameView: View {
     
     var cards: some View {
         LazyVGrid (columns: [GridItem(.adaptive(minimum: 79), spacing: 0)] , spacing: 0) {
-            ForEach(0..<emojiMemoryController.cards.count, id: \.self) { index in
-                CardView(emojiMemoryController.cards[index])
+            ForEach(emojiMemoryController.cards) { card in
+                CardView(card)
                     .aspectRatio(2/3, contentMode: .fit)
                     .padding(4)
             }

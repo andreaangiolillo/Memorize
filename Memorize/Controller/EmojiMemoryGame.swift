@@ -58,8 +58,12 @@ class EmojiMemoryGame: ObservableObject {
     // MARK: - Intents
     
     func changeTheme(_ theme: Themes){
-        selectedTheme = theme
-        newCards(cardCount)
+        if (selectedTheme != theme){
+            selectedTheme = theme
+            newCards(cardCount)
+        }else{
+            shuffle()
+        }
     }
     
     func newCards(_ numberOfPairsOfCards: Int) {
