@@ -59,6 +59,9 @@ struct EmojiMemoryGameView: View {
                 CardView(card)
                     .aspectRatio(2/3, contentMode: .fit)
                     .padding(4)
+                    .onTapGesture {
+                        emojiMemoryController.choose(card)
+                    }
             }
         }
         .foregroundColor(getColorBasedOnTheme(theme: emojiMemoryController.theme))

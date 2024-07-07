@@ -22,8 +22,20 @@ struct MemoryGame <CardContent> where CardContent:Equatable{
     }
     
     
-    func choose (card: Card){
+    mutating func choose (card: Card){
+        let cardIndex = findIndex(card)
         
+        cards[cardIndex].toggle()
+    }
+    
+    func findIndex(_ card: Card) -> Int {
+        for index in cards.indices {
+            if cards[index].id == card.id{
+                return index
+            }
+        }
+        
+        return 0
     }
     
     mutating func changeCards(numberOfPairsOfCards: Int, cardContentFactory: (Int) -> CardContent) {
