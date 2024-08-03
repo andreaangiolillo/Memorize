@@ -8,20 +8,11 @@
 import Foundation
 
 class EmojiMemoryGame: ObservableObject {
-    enum Themes {
-        case def
-        case halloween
-        case christmas
-    }
+
+    private static var defaultTheme = Theme(name: "Default", content: ["👻", "🐔", "👰🏻‍♂️", "🐵", "🐉", "🪃","🧞‍♂️", "🐧", "👹", "🐥", "🐘","🧙‍♀️", "🧙🏼‍♂️"], nPairs: 4, color: "blue", icon: "theatermasks.circle")
     
-    private static let contents: [Themes: [String]] = [
-        .def:  ["👻", "🐔", "👰🏻‍♂️", "🐵", "🐉", "🪃","🧞‍♂️", "🐧", "👹", "🐥", "🐘","🧙‍♀️", "🧙🏼‍♂️"],
-        .halloween: ["🎃", "🕷️", "👻", "👽", "👹", "🧙‍♀️", "🧟‍♂️", "🧛🏼‍♂️", "🧌", "🧟‍♀️", "🧙🏼‍♂️", "🕸️", "🦸🏻‍♀️", "🧝🏾‍♀️"],
-        .christmas: ["☃️", "⛄️", "🎅🏼", "🧑🏽‍🎄", "❄️", "🌨️", "🎁", "🌟", "🦌", "🍪", "🔔", "🎄", "🍾", "🌠", "🎉"]
-    ]
-    
-    private static func createMemoryGame(_ theme: Themes = .def) -> MemoryGame<String> {
-        let emoji = contents[theme]!.shuffled()
+    private static func createMemoryGame(_ theme: Theme = defaultTheme) -> MemoryGame<String> {
+        let emoji = theme.content.shuffled()
         return MemoryGame(numberOfPairsOfCards: 4){ pairIndex in
             if emoji.indices.contains(pairIndex){
                 return  emoji[pairIndex]
@@ -30,16 +21,20 @@ class EmojiMemoryGame: ObservableObject {
         }
     }
     
-    
+    @Published private var selectedTheme = defaultTheme
     @Published private var model = createMemoryGame()
-    @Published private var selectedTheme = Themes.def
     @Published private var cardCount = 4
+    @Published private var themes: [Theme] = [
+        Theme(name: "Default", content: ["👻", "🐔", "👰🏻‍♂️", "🐵", "🐉", "🪃","🧞‍♂️", "🐧", "👹", "🐥", "🐘","🧙‍♀️", "🧙🏼‍♂️"], nPairs: 4, color: "blue", icon: "theatermasks.circle"),
+         Theme(name: "Hallowen", content: ["🎃", "🕷️", "👻", "👽", "👹", "🧙‍♀️", "🧟‍♂️", "🧛🏼‍♂️", "🧌", "🧟‍♀️", "🧙🏼‍♂️", "🕸️", "🦸🏻‍♀️", "🧝🏾‍♀️"], nPairs: 4, color: "orange", icon: "theatermasks.circle"),
+         Theme(name: "Christmas", content:["☃️", "⛄️", "🎅🏼", "🧑🏽‍🎄", "❄️", "🌨️", "🎁", "🌟", "🦌", "🍪", "🔔", "🎄", "🍾", "🌠", "🎉"], nPairs: 4, color: "red", icon: "gift.circle")
+     ]
     
     var cards: Array<MemoryGame<String>.Card> {
         return model.cards
     }
     
-    var theme: Themes {
+    var theme: Theme {
         return selectedTheme
     }
     
@@ -47,14 +42,18 @@ class EmojiMemoryGame: ObservableObject {
         return cardCount
     }
     
+    var availableThemes: Array<Theme> {
+        return themes
+    }
+    
     func isValidCountAdjustement(by offset: Int) -> Bool{
-            return cardCount + offset > 2 && cardCount + offset < EmojiMemoryGame.contents[.def]!.count
+        return cardCount + offset > 2 && cardCount + offset < selectedTheme.content.count
     }
     
     // MARK: - Intents
     
-    func changeTheme(_ theme: Themes){
-        if (selectedTheme != theme){
+    func changeTheme(_ theme: Theme){
+        if (selectedTheme.id != theme.id){
             selectedTheme = theme
             newCards(cardCount)
         }else{
@@ -63,7 +62,7 @@ class EmojiMemoryGame: ObservableObject {
     }
     
     func newCards(_ numberOfPairsOfCards: Int) {
-        let emoji = EmojiMemoryGame.contents[theme]!
+        let emoji = selectedTheme.content
         model.changeCards(numberOfPairsOfCards: numberOfPairsOfCards){ pairIndex in
             if emoji.indices.contains(pairIndex){
                 return  emoji[pairIndex]

@@ -41,15 +41,28 @@ struct EmojiMemoryGameView: View {
     
     // themesAdjuster contains the themes buttons views.
     var themesAdjuster: some View {
-        HStack {
-            Spacer()
-            defaultTheme
-            Spacer()
-            hallowenTheme
-            Spacer()
-            christmasTheme
-            Spacer()
+        ScrollView(.horizontal) {
+            HStack(spacing: 15) {
+                ForEach(emojiMemoryController.availableThemes) { theme in
+                    Spacer()
+                    themeAdjuster(theme: theme)
+                }
+            }
         }
+    }
+    
+    func themeAdjuster(theme: Theme) -> some View {
+        Button(action: {
+            emojiMemoryController.changeTheme(theme)
+        }, label: {
+            VStack{
+                Image(systemName: theme.icon)
+                    .imageScale(.large)
+                    .font(.largeTitle)
+                Text(theme.name).font(.body)
+            }
+            .foregroundColor(Color(wordName: theme.color))
+        })
     }
 
     
@@ -64,7 +77,7 @@ struct EmojiMemoryGameView: View {
                     }
             }
         }
-        .foregroundColor(getColorBasedOnTheme(theme: emojiMemoryController.theme))
+        .foregroundColor(Color(wordName: emojiMemoryController.theme.color))
     }
     
     /*
@@ -79,49 +92,13 @@ struct EmojiMemoryGameView: View {
             }
         }, label: {
             Image(systemName: symbol)
-                .foregroundColor(
+                .foregroundColor(Color(wordName: 
                     emojiMemoryController.isValidCountAdjustement(by: offset) ?
-                    getColorBasedOnTheme(theme: emojiMemoryController.theme) :
-                        Color.gray)
+                    emojiMemoryController.theme.color : "gray"))
         })
         .disabled({
             return !emojiMemoryController.isValidCountAdjustement(by: offset)
         }())
-    }
-    
-    
-    func themeAdjuster(theme: EmojiMemoryGame.Themes, symbol: String) -> some View {
-        Button(action: {
-            emojiMemoryController.changeTheme(theme)
-        }, label: {
-            VStack{
-                Image(systemName: symbol)
-                    .imageScale(.large)
-                    .font(.largeTitle)
-                Text({
-                    switch theme {
-                    case .def:
-                        return "Default"
-                    case.christmas:
-                        return "Christmas"
-                    case.halloween:
-                        return "Hallowen"
-                    }
-                }()).font(.body)
-            }
-            .foregroundColor(getColorBasedOnTheme(theme: theme))
-        })
-    }
-    
-    func getColorBasedOnTheme(theme: EmojiMemoryGame.Themes) -> Color {
-        switch theme {
-        case .def:
-            return .blue
-        case.christmas:
-            return .red
-        case.halloween:
-            return .orange
-        }
     }
     
     
@@ -133,17 +110,6 @@ struct EmojiMemoryGameView: View {
         return cardCountAdjuster(by: +1, symbol: "rectangle.stack.fill.badge.plus")
     }
     
-    var defaultTheme: some View {
-        return themeAdjuster(theme: EmojiMemoryGame.Themes.def, symbol: "restart.circle")
-    }
-    
-    var hallowenTheme: some View {
-        return themeAdjuster(theme: EmojiMemoryGame.Themes.halloween, symbol: "theatermasks.circle")
-    }
-    
-    var christmasTheme: some View {
-        return themeAdjuster(theme: EmojiMemoryGame.Themes.christmas, symbol: "gift.circle")
-    }
 }
 
 struct CardView: View {
@@ -164,6 +130,28 @@ struct CardView: View {
             }
             .opacity(card.isFaceUp ? 1 : 0)
             base.fill().opacity(card.isFaceUp ? 0 : 1)
+        }
+    }
+}
+
+extension Color {
+    
+    init?(wordName: String) {
+        switch wordName {
+        case "clear":       self = .clear
+        case "black":       self = .black
+        case "white":       self = .white
+        case "gray":        self = .gray
+        case "red":         self = .red
+        case "green":       self = .green
+        case "blue":        self = .blue
+        case "orange":      self = .orange
+        case "yellow":      self = .yellow
+        case "pink":        self = .pink
+        case "purple":      self = .purple
+        case "primary":     self = .primary
+        case "secondary":   self = .secondary
+        default:            return nil
         }
     }
 }
