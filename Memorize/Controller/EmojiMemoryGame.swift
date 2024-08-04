@@ -80,6 +80,7 @@ class EmojiMemoryGame: ObservableObject {
     }
     
     func newCards(_ numberOfPairsOfCards: Int) {
+        toggledCard = nil
         let emoji = selectedTheme.content
         model.changeCards(numberOfPairsOfCards: numberOfPairsOfCards){ pairIndex in
             if emoji.indices.contains(pairIndex){
