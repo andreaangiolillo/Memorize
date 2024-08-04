@@ -125,6 +125,7 @@ struct EmojiMemoryGameView: View {
         Button(action: {
             if (emojiMemoryController.isValidCountAdjustement(by: offset)) {
                 emojiMemoryController.adjustCardCount(by: offset)
+                emojiMemoryController.resetScore()
             }
         }, label: {
             Image(systemName: symbol)

@@ -9,11 +9,11 @@ import Foundation
 
 class EmojiMemoryGame: ObservableObject {
 
-    private static var defaultTheme = Theme(name: "Default", content: ["👻", "🐔", "👰🏻‍♂️", "🐵", "🐉", "🪃","🧞‍♂️", "🐧", "👹", "🐥", "🐘","🧙‍♀️", "🧙🏼‍♂️"], nPairs: 4, color: "blue", icon: "theatermasks.circle")
+    private static var defaultTheme = Theme(name: "Default", content: ["👻", "🐔", "👰🏻‍♂️", "🐵", "🐉", "🪃","🧞‍♂️", "🐧", "👹", "🐥", "🐘","🧙‍♀️", "🧙🏼‍♂️"], nPairs: 8, color: "blue", icon: "theatermasks.circle")
     
     private static func createMemoryGame(_ theme: Theme = defaultTheme) -> MemoryGame<String> {
         let emoji = theme.content.shuffled()
-        return MemoryGame(numberOfPairsOfCards: 4){ pairIndex in
+        return MemoryGame(numberOfPairsOfCards: theme.nPairs){ pairIndex in
             if emoji.indices.contains(pairIndex){
                 return  emoji[pairIndex]
             }
@@ -26,13 +26,13 @@ class EmojiMemoryGame: ObservableObject {
     private var toggledCard: MemoryGame<String>.Card? = nil
     @Published private var selectedTheme = defaultTheme
     @Published private var model = createMemoryGame()
-    @Published private var cardCount = 4
+    @Published private var cardCount = 8
     @Published private var themes: [Theme] = [
-         Theme(name: "Hallowen", content: ["🎃", "🕷️", "👻", "👽", "👹", "🧙‍♀️", "🧟‍♂️", "🧛🏼‍♂️", "🧌", "🧟‍♀️", "🧙🏼‍♂️", "🕸️", "🦸🏻‍♀️", "🧝🏾‍♀️"], nPairs: 4, color: "orange", icon: "theatermasks.circle"),
+         Theme(name: "Hallowen", content: ["🎃", "🕷️", "👻", "👽", "👹", "🧙‍♀️", "🧟‍♂️", "🧛🏼‍♂️", "🧌", "🧟‍♀️", "🧙🏼‍♂️", "🕸️", "🦸🏻‍♀️", "🧝🏾‍♀️"], nPairs: 8, color: "orange", icon: "theatermasks.circle"),
          Theme(name: "Christmas", content:["☃️", "⛄️", "🎅🏼", "🧑🏽‍🎄", "❄️", "🌨️", "🎁", "🌟", "🦌", "🍪", "🔔", "🎄", "🍾", "🌠", "🎉"], nPairs: 4, color: "red", icon: "gift.circle"),
-         Theme(name: "Sports", content:["⚽️", "🏀", "🏈", "⚾️", "🥎", "🎾", "🏐", "🏓", "🏉", "🎳", "🏸", "🏒", "🥏", "🥌", "🤺", "⛷️"], nPairs: 4, color: "black", icon: "basketball.circle"),
-         Theme(name: "Animals", content: ["🐩", "🐇", "🐶", "🐱", "🦊", "🐿️", "🐗", "🫎", "🐼", "🐷", "🐨", "🐴"], nPairs: 4, color: "green", icon: "tortoise.circle"),
-         Theme(name: "Fantasy", content: ["🧙‍♀️", "🧟‍♂️", "🧛🏼‍♂️", "🧌", "🧟‍♀️", "🧙🏼‍♂️", "🦸🏻‍♀️", "🧝🏾‍♀️", "🧚🏻", "🧞", "🦹🏼‍♂️"], nPairs: 4, color: "purple", icon: "logo.xbox"),
+         Theme(name: "Sports", content:["⚽️", "🏀", "🏈", "⚾️", "🥎", "🎾", "🏐", "🏓", "🏉", "🎳", "🏸", "🏒", "🥏", "🥌", "🤺", "⛷️"], nPairs: 6, color: "black", icon: "basketball.circle"),
+         Theme(name: "Animals", content: ["🐩", "🐇", "🐶", "🐱", "🦊", "🐿️", "🐗", "🫎", "🐼", "🐷", "🐨", "🐴"], nPairs: 8, color: "green", icon: "tortoise.circle"),
+         Theme(name: "Fantasy", content: ["🧙‍♀️", "🧟‍♂️", "🧛🏼‍♂️", "🧌", "🧟‍♀️", "🧙🏼‍♂️", "🦸🏻‍♀️", "🧝🏾‍♀️", "🧚🏻", "🧞", "🦹🏼‍♂️"], nPairs: 8, color: "purple", icon: "logo.xbox"),
      ]
     
     var cards: Array<MemoryGame<String>.Card> {
@@ -104,8 +104,8 @@ class EmojiMemoryGame: ObservableObject {
     
     func choose(_ card: MemoryGame<String>.Card){
         if toggledCard == nil {
-            toggledCard = card
             model.choose(card: card)
+            toggledCard = card
             return
         }
         
@@ -113,13 +113,17 @@ class EmojiMemoryGame: ObservableObject {
             updateScoreWithMatch()
             model.match(card: card)
             model.match(card: toggledCard!)
-        }else{
-            model.choose(card: card)
-            updateScoreWithMisMatch()
-            self.model.choose(card: card)
-            self.model.choose(card: self.toggledCard!)
+            toggledCard = nil
+            return
         }
-        toggledCard = nil
+        
+        if card.isSeen {
+            updateScoreWithMisMatch()
+        }
+        
+        model.choose(card: toggledCard!)
+        model.choose(card: card)
+        toggledCard = card
     }
     
     func isMatch(_ idCardOne: String, _ idCardTwo: String) -> Bool {
