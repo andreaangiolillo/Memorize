@@ -9,16 +9,20 @@ import SwiftUI
 
 struct EmojiMemoryGameView: View {
     @ObservedObject var emojiMemoryController:EmojiMemoryGame
+    @State var itemHovered: Bool = false
    
     // body contains the root view shown in the app
     var body: some View {
         VStack{
             cardCountAdjuster
+    
             score
             ScrollView{
                 cards
                     .animation(.default, value: emojiMemoryController.cards)
             }
+  
+           
             Spacer()
 
             Spacer()
@@ -33,12 +37,39 @@ struct EmojiMemoryGameView: View {
     
     var score: some View{
         HStack{
+            Button(action: {
+                print("pressed")
+                itemHovered.toggle()
+            }, label: {
+                Image(systemName: "info.circle" )
+                    .imageScale(.large)
+                    .font(.title3)
+                    .foregroundColor(Color(wordName:emojiMemoryController.theme.color))
+            }).popover(isPresented: $itemHovered) {
+                VStack{
+                    Image(systemName: "arrowshape.down.circle" )
+                        .imageScale(.large)
+                        .font(.title)
+                        .padding()
+                        .foregroundColor(Color(wordName:emojiMemoryController.theme.color))
+                    Text("Swipe down to go back to the game")
+                }
+
+                Spacer()
+                Text("Rules")
+                    .bold()
+                    .font(.title)
+                    .foregroundColor(Color(wordName:emojiMemoryController.theme.color))
+                Text("+ 2 points for every match and - 1 point for every previously seen card that is involved in a mismatch.")
+                    .font(.title3)
+                    .padding()
+                Spacer()
+            }
             
             Text("Score: \(emojiMemoryController.score)")
                 .font(.title)
                 .bold()
         }
-        .foregroundColor(Color(wordName:emojiMemoryController.theme.color))
     }
     
     // cardCountAdjuster represents the view containing the remove/add buttons and title
