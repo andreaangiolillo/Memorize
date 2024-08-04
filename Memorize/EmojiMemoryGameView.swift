@@ -14,14 +14,31 @@ struct EmojiMemoryGameView: View {
     var body: some View {
         VStack{
             cardCountAdjuster
+            score
             ScrollView{
                 cards
                     .animation(.default, value: emojiMemoryController.cards)
             }
             Spacer()
-            themesAdjuster
+
+            Spacer()
+            HStack{
+                newGame()
+                themesAdjuster
+            }
+
         }
         .padding()
+    }
+    
+    var score: some View{
+        HStack{
+            
+            Text("Score: \(emojiMemoryController.score)")
+                .font(.title)
+                .bold()
+        }
+        .foregroundColor(Color(wordName:emojiMemoryController.theme.color))
     }
     
     // cardCountAdjuster represents the view containing the remove/add buttons and title
@@ -41,7 +58,7 @@ struct EmojiMemoryGameView: View {
     
     // themesAdjuster contains the themes buttons views.
     var themesAdjuster: some View {
-        ScrollView(.horizontal) {
+        ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 15) {
                 ForEach(emojiMemoryController.availableThemes) { theme in
                     Spacer()
@@ -51,9 +68,26 @@ struct EmojiMemoryGameView: View {
         }
     }
     
+    func newGame() -> some View {
+        Button(action: {
+            emojiMemoryController.setRandomTheme()
+            emojiMemoryController.resetScore()
+        }, label: {
+            VStack{
+                Image(systemName: "plus.circle" )
+                    .imageScale(.large)
+                    .font(.largeTitle)
+                Text("New Game").font(.body)
+            }
+            .foregroundColor(Color(wordName:emojiMemoryController.theme.color))
+        })
+        .buttonStyle(PlainButtonStyle())
+    }
+    
     func themeAdjuster(theme: Theme) -> some View {
         Button(action: {
             emojiMemoryController.changeTheme(theme)
+            emojiMemoryController.resetScore()
         }, label: {
             VStack{
                 Image(systemName: theme.icon)
@@ -73,7 +107,9 @@ struct EmojiMemoryGameView: View {
                     .aspectRatio(2/3, contentMode: .fit)
                     .padding(4)
                     .onTapGesture {
-                        emojiMemoryController.choose(card)
+                        if !card.isMatched && !card.isFaceUp {
+                            emojiMemoryController.choose(card)
+                        }
                     }
             }
         }

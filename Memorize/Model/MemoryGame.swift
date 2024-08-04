@@ -28,6 +28,12 @@ struct MemoryGame <CardContent> where CardContent:Equatable{
         cards[cardIndex].toggle()
     }
     
+    mutating func match (card: Card){
+        let cardIndex = findIndex(card)
+        
+        cards[cardIndex].matched()
+    }
+    
     func findIndex(_ card: Card) -> Int {
         for index in cards.indices {
             if cards[index].id == card.id{
@@ -53,7 +59,7 @@ struct MemoryGame <CardContent> where CardContent:Equatable{
     }
     
     struct Card: Equatable, Identifiable {
-        var isFaceUp = true
+        var isFaceUp = false
         var isMatched = false
         let content: CardContent
         
@@ -61,6 +67,11 @@ struct MemoryGame <CardContent> where CardContent:Equatable{
         
         mutating func toggle(){
             isFaceUp.toggle()
+        }
+        
+        mutating func matched(){
+            isMatched = true
+            isFaceUp =  true
         }
     }
 }
