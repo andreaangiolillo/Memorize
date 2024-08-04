@@ -17,7 +17,7 @@ class EmojiMemoryGame: ObservableObject {
             if emoji.indices.contains(pairIndex){
                 return  emoji[pairIndex]
             }
-            return "⁉️"
+            return emoji[Int.random(in: 0..<emoji.count)]
         }
     }
     
@@ -85,7 +85,7 @@ class EmojiMemoryGame: ObservableObject {
             if emoji.indices.contains(pairIndex){
                 return  emoji[pairIndex]
             }
-            return "⁉️"
+            return emoji[Int.random(in: 0..<emoji.count)]
         }
     }
     
